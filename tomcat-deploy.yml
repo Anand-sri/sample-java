@@ -1,0 +1,28 @@
+---
+- hosts: tomcat
+  tasks:
+    - name: install java
+      yum:
+        name: java-1.8.0
+        state: installed
+    - name: download tomcat package
+      get_url:
+        url: https://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.43/bin/apache-tomcat-9.0.43.tar.gz
+        dest: /opt/apache-tomcat-9.0.43.tar.gz
+    - name: extract tomcat package
+      unarchive:
+        src: /opt/apache-tomcat-9.0.43.tar.gz
+        dest: /opt
+        remote_src: yes
+#    - name: remove execting files in tomcat
+#      file:
+#        path: /opt/apache-tomcat-9.0.43/webapps/ROOT.war
+#        state: abcent
+    - name: copy jar file to tomcat service
+      copy:
+        src: /var/lib/jenkins/workspace/sample-java-pipeline/target/my-app-1.0-SNAPSHOT.jar
+        dest: /opt/apache-tomcat-9.0.43/webapps/myapp.jar
+    - name: start tomcat
+      shell: ./startup.sh
+      args:
+        chdir: /opt/apache-tomcat-9.0.43/bin
